@@ -53,4 +53,11 @@ export class UsersService {
     //userId를 가진 유저가 존재하는지
     throw new Error('Method not implemented');
   }
+
+  async findAll() {
+    console.log('pass');
+  }
+  async findOne(id: number) {
+    console.log(id);
+  }
 }
