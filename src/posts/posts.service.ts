@@ -14,15 +14,24 @@ export class PostsService {
     console.log(contentId);
     return this.posts.find((post) => post.contentId === contentId);
   }
-  //게시글 검색
-  async createPost(content: string) {
+  //게시글 등록
+  async createPost(
+    content: string,
+    userId: string,
+    tag: Array<string>,
+    location: string,
+  ) {
     const contentId: string = uuid();
     const post: Posts = {
+      userId,
       contentId,
       content,
+      tag,
+      location,
     };
     this.posts.push(post);
-    console.log('게시글 생성 완료!');
+    console.log('게시글 생성 완료!', post);
+    console.log(this.posts);
   }
   //게시글 삭제
   async deletePost(contentId: string) {

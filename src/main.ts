@@ -11,7 +11,7 @@ dotenv.config({
       ? '.production.env'
       : process.env.NODE_ENV === 'stage'
       ? '.stage.env'
-      : '.development.env',
+      : './development.env',
   ),
 });
 
