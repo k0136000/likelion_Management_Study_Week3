@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  ValidationPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
@@ -20,7 +21,7 @@ export class UsersController {
 
   //회원가입 로직
   @Post()
-  async createUser(@Body() dto: CreateUserDto): Promise<void> {
+  async createUser(@Body(ValidationPipe) dto: CreateUserDto): Promise<void> {
     const { name, email, password } = dto;
     await this.userService.createUser(name, email, password);
     console.log(dto);
@@ -40,14 +41,14 @@ export class UsersController {
   }
 
   @Get('/:id')
-  findOne(
+  async getUserInfo(
     @Param(
-      'id',
+      'userId',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
-    id: number,
+    userId: number,
   ) {
-    return this.userService.findOne(id);
+    return await this.userService.getUserInfo(userId);
   }
 
   @Get()
@@ -57,10 +58,5 @@ export class UsersController {
   ) {
     console.log(offset, limit);
     return this.userService.findAll();
-  }
-
-  @Get('/:id')
-  async getUserInfo(@Param('id') userId: string): Promise<string> {
-    return await this.userService.getUserInfo(userId);
   }
 }

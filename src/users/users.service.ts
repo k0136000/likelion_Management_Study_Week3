@@ -49,7 +49,7 @@ export class UsersService {
     throw new Error('Method not implemented');
   }
 
-  async getUserInfo(userId: string): Promise<string> {
+  async getUserInfo(userId: number): Promise<string> {
     //userId를 가진 유저가 존재하는지
     throw new Error('Method not implemented');
   }
