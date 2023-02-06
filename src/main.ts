@@ -4,16 +4,16 @@ import dotenv = require('dotenv');
 import path = require('path');
 import { ValidationPipe } from '@nestjs/common';
 
-//env파일의 경로를 NODE_ENV값에 따라 다르게 지정한다.
-dotenv.config({
-  path: path.resolve(
-    process.env.NODE_ENV === 'production'
-      ? '.production.env'
-      : process.env.NODE_ENV === 'stage'
-      ? '.stage.env'
-      : './development.env',
-  ),
-});
+// env파일의 경로를 NODE_ENV값에 따라 다르게 지정한다.
+// dotenv.config({
+//   path: path.resolve(
+//     process.env.NODE_ENV === 'production'
+//       ? '.production.env'
+//       : process.env.NODE_ENV === 'stage'
+//       ? '.stage.env'
+//       : '.development.env',
+//   ),
+// });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

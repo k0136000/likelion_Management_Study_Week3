@@ -31,10 +31,10 @@ export class UsersService {
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   private async sendMemberJoinEmail(email: string, signupVerifyToken: string) {
-    await this.emailService.sendMemberJoinVerification(
-      email,
-      signupVerifyToken,
-    );
+    // await this.emailService.sendMemberJoinVerification(
+    //   email,
+    //   signupVerifyToken,
+    // );
   }
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
