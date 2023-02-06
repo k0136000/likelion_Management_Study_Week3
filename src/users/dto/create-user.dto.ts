@@ -6,8 +6,7 @@ import {
   IsEmail,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { BadRequestException } from '@nestjs/common';
-
+import { NotIn } from '../../../utils/not-in';
 export class CreateUserDto {
   @Transform((params) => {
     console.log(params);
@@ -21,14 +20,9 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @Transform(({ value, obj }) => {
-    if (obj.password.includes(obj.name.trim())) {
-      throw new BadRequestException(
-        'password는 name과 같은 문자열을 포함할 수 없습니다.',
-      );
-    }
-    return value.trim();
-  })
+  @Transform((params) => params.value.trim())
+  // eslint-disable-next-line prettier/prettier
+  @NotIn('password', { message: 'password는 name과 같은 문자열을 포함할 수 없습니다.' })
   @IsString()
   @Matches(/^[A-Za-z\d!@#$%^&*()]{8,30}$/)
   readonly password: string;

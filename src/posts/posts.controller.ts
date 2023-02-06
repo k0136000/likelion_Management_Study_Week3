@@ -19,11 +19,11 @@ export class PostsController {
     return await this.postService.getPostInfo(contentId);
   }
 
+  // 1.유저 아이디 2.내용, 3. 태그 4.위치
   @Post()
   async createPost(@Body() dto: PostDto): Promise<void> {
-    const { content } = dto;
-    await this.postService.createPost(content);
-    console.log(dto);
+    const { content, userId, tag, location } = dto;
+    await this.postService.createPost(content, userId, tag, location);
   }
 
   @Delete()
@@ -34,7 +34,7 @@ export class PostsController {
 
   @Patch()
   async patchPost(@Body() dto: PatchPostDto): Promise<void> {
-    const { content, contentId } = dto;
-    await this.postService.patchPost(contentId, content);
+    const { content, contentID } = dto;
+    await this.postService.patchPost(contentID, content);
   }
 }
