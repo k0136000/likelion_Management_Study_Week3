@@ -20,7 +20,7 @@ export class UsersController {
   constructor(private userService: UsersService) {} //UserService를 컨트롤러에 주입합니다.
 
   //회원가입 로직
-  @Post()
+  @Post('/save')
   async createUser(@Body(ValidationPipe) dto: CreateUserDto): Promise<void> {
     const { name, email, password } = dto;
     await this.userService.createUser(name, email, password);
