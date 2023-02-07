@@ -35,6 +35,8 @@ export class EmailService {
   ) {
     const baseUrl = this.config.baseUrl;
 
+    // signupVerifyToken은 회원 가입시 서버에서 발급한 임의의 문자열
+    // 이메일 인증 확인 버튼을 누르면 이 토큰을 Post/users/email-veriy엔드포인트로 요청.
     const url = `${baseUrl}/users/email-verify?signupVerifyToken=${signupVerifyToken}`; //유저가 가질 링크를 생성합니다. 이링크를 통해 다시 우리 서비스로 인증 요청이 들어옵니다.
 
     const mailOptions: EmailOptions = {
@@ -49,6 +51,6 @@ export class EmailService {
         `,
     };
 
-    return await this.transporter.sendMail(mailOptions); //transformer 객체를 이요하여 메일을 전송합니다.
+    return await this.transporter.sendMail(mailOptions); //transformer 객체를 이용하여 메일을 전송합니다.
   }
 }
