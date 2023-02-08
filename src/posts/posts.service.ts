@@ -3,12 +3,15 @@ import { getConnection, Repository } from 'typeorm';
 import { PostEntity } from './posts.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { v1 as uuid } from 'uuid';
+import { UserEntity } from 'src/users/users.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(PostEntity)
     private postRepository: Repository<PostEntity>,
+    @InjectRepository(UserEntity) // 유저 모듈 내에서 사용할 저장소 등록
+    private userRepository: Repository<UserEntity>,
   ) {}
   //전체 게시글 검색
   async getPosts() {
@@ -28,10 +31,14 @@ export class PostsService {
     tag: string[],
     location: string,
   ) {
+    console.log(userId);
     const post = new PostEntity();
     post.contentId = uuid();
-    post.userId = userId;
     post.content = content;
+    const user = await this.userRepository.findOne({
+      where: { userId },
+    });
+    post.user = user;
     // post.tag = tag;
     post.location = location;
     await this.postRepository.save(post); // 저장소를 이용해여 엔티티를 DB에 저장
@@ -47,7 +54,7 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('포스트가 존재하지 않습니다.');
     }
-    if (post.userId !== userId) {
+    if (post.user.userId !== userId) {
       throw new Error();
     }
     await this.postRepository.delete(contentId);
@@ -61,7 +68,7 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('포스트가 존재하지 않습니다.');
     }
-    if (post.userId !== userId) {
+    if (post.user.userId !== userId) {
       throw new Error();
     }
     post.content = content;

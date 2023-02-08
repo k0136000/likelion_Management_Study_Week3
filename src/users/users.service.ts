@@ -8,7 +8,6 @@ import { EmailService } from 'src/email/email.service';
 import { UserEntity } from './users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { NotFoundError } from 'rxjs';
 import { AuthService } from 'src/auth/auth.service';
 import { UserInfo } from './UserInfo';
 
