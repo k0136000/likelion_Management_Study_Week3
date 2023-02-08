@@ -1,4 +1,4 @@
-import * as uuid from 'uuid';
+import { v1 as uuid } from 'uuid';
 import {
   Injectable,
   NotFoundException,
@@ -29,7 +29,7 @@ export class UsersService {
         '해당 이메일로 가입이 되어 있는 상태입니다.',
       );
     }
-    const signupVerifyToken = uuid.v1();
+    const signupVerifyToken = uuid();
 
     await this.saveUser(name, email, password, signupVerifyToken); //회원가입할 회원 정보 DB에 저장
     await this.sendMemberJoinEmail(email, signupVerifyToken); //이메일 인증 요청
@@ -54,7 +54,7 @@ export class UsersService {
     }
     //회원 가입 완료 후 바로 로그인이 될 수 있도록 jwt 토큰을 리턴
     return this.authService.login({
-      id: user.id,
+      userId: user.userId,
       name: user.name,
       email: user.email,
     });
@@ -69,7 +69,7 @@ export class UsersService {
   ) {
     const user = new UserEntity(); // 새로운 유저 엔티티 객체 생성
     // user.id = ulid();
-    user.id = '1234';
+    user.userId = uuid();
     user.name = name;
     user.email = email;
     user.password = password;
@@ -90,8 +90,8 @@ export class UsersService {
 
     try {
       const user = new UserEntity(); // 새로운 유저 엔티티 객체 생성
-      // user.id = ulid();
-      user.id = '1234';
+      user.userId = ulid();
+      // user.userId = '1234';
       user.name = name;
       user.email = email;
       user.password = password;
@@ -127,7 +127,7 @@ export class UsersService {
       throw new NotFoundException('유저가 존재하지 않습니다.');
     }
     return this.authService.login({
-      id: user.id,
+      userId: user.userId,
       name: user.name,
       email: user.email,
     });
@@ -136,14 +136,14 @@ export class UsersService {
   async getUserInfo(userId: string): Promise<UserInfo> {
     //userId를 가진 유저가 존재하는지
     const user = await this.userRepository.findOne({
-      where: { id: userId },
+      where: { userId },
     });
     console.log(user);
     if (!user) {
       throw new NotFoundException('유저가 존재하지 않습니다.');
     }
     return {
-      id: user.id,
+      id: user.userId,
       name: user.name,
       email: user.email,
     };

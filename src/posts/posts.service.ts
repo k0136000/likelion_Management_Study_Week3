@@ -1,48 +1,71 @@
-import { Injectable } from '@nestjs/common';
-import { Posts } from './post.models';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { getConnection, Repository } from 'typeorm';
+import { PostEntity } from './posts.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 import { v1 as uuid } from 'uuid';
 
 @Injectable()
 export class PostsService {
-  private posts: Posts[] = [];
+  constructor(
+    @InjectRepository(PostEntity)
+    private postRepository: Repository<PostEntity>,
+  ) {}
   //전체 게시글 검색
   async getPosts() {
-    return this.posts;
+    return await this.postRepository.find();
   }
   //특정 게시글 검색
   async getPostInfo(contentId: string) {
     console.log(contentId);
-    return this.posts.find((post) => post.contentId === contentId);
+    return this.postRepository.findOne({
+      where: { contentId },
+    });
   }
   //게시글 등록
   async createPost(
     content: string,
     userId: string,
-    tag: Array<string>,
+    tag: string[],
     location: string,
   ) {
-    const contentId: string = uuid();
-    const post: Posts = {
-      userId,
-      contentId,
-      content,
-      tag,
-      location,
-    };
-    this.posts.push(post);
-    console.log('게시글 생성 완료!', post);
-    console.log(this.posts);
+    const post = new PostEntity();
+    post.contentId = uuid();
+    post.userId = userId;
+    post.content = content;
+    // post.tag = tag;
+    post.location = location;
+    await this.postRepository.save(post); // 저장소를 이용해여 엔티티를 DB에 저장
+    console.log('게시글 생성 완료!');
+    return;
   }
   //게시글 삭제
-  async deletePost(contentId: string) {
-    this.posts = this.posts.filter((post) => post.contentId !== contentId);
+  async deletePost(userId: string, contentId: string) {
+    const post = await this.postRepository.findOne({
+      where: { contentId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('포스트가 존재하지 않습니다.');
+    }
+    if (post.userId !== userId) {
+      throw new Error();
+    }
+    await this.postRepository.delete(contentId);
   }
   //게시글 일부 수정
-  async patchPost(contentId: string, content: string) {
-    const post = this.posts.find((post) => post.contentId === contentId);
-    this.posts = this.posts.filter((post) => post.contentId !== contentId);
+  async patchPost(userId: string, contentId: string, content: string) {
+    const post = await this.postRepository.findOne({
+      where: { contentId },
+    });
+
+    if (!post) {
+      throw new NotFoundException('포스트가 존재하지 않습니다.');
+    }
+    if (post.userId !== userId) {
+      throw new Error();
+    }
     post.content = content;
-    this.posts.push(post);
+    await this.postRepository.save(post);
     console.log('게시글 수정 완료');
   }
 }
