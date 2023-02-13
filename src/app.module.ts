@@ -15,6 +15,7 @@ import { generateTypeOrmConfig } from './config/typeorm.config';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { Logger2Middleware } from './middleware/logger2.middleware';
 import { AuthModule } from './auth/auth.module';
+import { PostsModule } from './posts/posts.module';
 
 // UsersModule에 usercontroller, emailcontroller가 포함되어 있으므로 여기서 포함시키지 않아도 됨.
 @Module({
@@ -28,10 +29,11 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRoot(generateTypeOrmConfig(process.env)),
     UsersModule,
     EmailModule,
+    PostsModule,
     AuthModule,
   ],
-  controllers: [PostsController, AppController],
-  providers: [PostsService],
+  controllers: [AppController],
+  providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {

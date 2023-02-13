@@ -1,3 +1,3 @@
 export class SearchPostDto {
-  readonly contentId: string;
+  contentId: string;
 }

@@ -2,9 +2,12 @@ import * as jwt from 'jsonwebtoken';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import autoConfig from 'src/config/authConfig';
 import { ConfigType } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserEntity } from 'src/users/users.entity';
+import { Repository } from 'typeorm';
 
 interface User {
-  id: string;
+  userId: string;
   name: string;
   email: string;
 }
@@ -13,6 +16,8 @@ interface User {
 export class AuthService {
   constructor(
     @Inject(autoConfig.KEY) private config: ConfigType<typeof autoConfig>,
+    @InjectRepository(UserEntity) // 유저 모듈 내에서 사용할 저장소 등록
+    private userRepository: Repository<UserEntity>,
   ) {}
 
   login(user: User) {
@@ -25,7 +30,7 @@ export class AuthService {
     });
   }
 
-  verify(jwtString: string) {
+  async verify(jwtString) {
     try {
       //verify()를 통해 검증을 수행, 리턴 값으로 토큰 속에 있던 id,email 정보 등이 리턴.
       const payload = jwt.verify(jwtString, this.config.jwtSecret) as (
@@ -33,16 +38,17 @@ export class AuthService {
         | string
       ) &
         User;
-      console.log(jwtString);
-      console.log(payload);
-      const { id, email } = payload;
-
-      console.log('통과');
-      return {
-        userId: id,
-        email,
-      };
+      const { userId } = payload;
+      const user = await this.userRepository.findOne({
+        where: { userId },
+      });
+      // return {
+      //   userId: id,
+      //   email,
+      // };
+      return user;
     } catch (e) {
+      console.log(e);
       throw new UnauthorizedException();
     }
   }

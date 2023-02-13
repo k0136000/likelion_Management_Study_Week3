@@ -9,14 +9,17 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Req,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from 'guards/canactivate.guard';
 import { AuthService } from 'src/auth/auth.service';
+import { Token } from 'utils/user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
+import { UserEntity } from './users.entity';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -51,18 +54,12 @@ export class UsersController {
   @UseGuards(AuthGuard)
   @Get('/getInfo/:userId')
   async getUserInfo(
+    @Token() user: UserEntity,
     @Headers() headers: any,
-    @Param(
-      'userId',
-      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-    )
+    @Param('userId')
     userId: string,
   ) {
-    console.log(userId);
-    const jwtString = headers.authorization.split('Bearer ')[1]; //헤더에서 Jwt 파싱
-
-    this.authService.verify(jwtString); //토큰 인증
-
+    console.log('userInformation', user);
     return await this.userService.getUserInfo(userId);
   }
 
