@@ -4,7 +4,6 @@ import {
   DefaultValuePipe,
   Get,
   Headers,
-  HttpException,
   Param,
   ParseIntPipe,
   Post,
@@ -15,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from 'guards/canactivate.guard';
 import { AuthService } from 'src/auth/auth.service';
-import { HttpExceptionFilter } from 'utils/exceptionPipe';
+import { HttpExceptionFilter } from '../../utils/exceptionPipe';
 import { Token } from 'utils/user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
@@ -41,12 +40,14 @@ export class UsersController {
   }
   //이메일 인증, 회원이 이메일 인증 확인 버튼 클릭시 요청됨.
   @Post('/email-verify')
+  @UseFilters(HttpExceptionFilter)
   async verifyEmail(@Query() dto: VerifyEmailDto): Promise<string> {
     const { signupVerifyToken } = dto;
     return await this.userService.verifyEmail(signupVerifyToken);
   }
   //로그인
   @Post('/login')
+  @UseFilters(HttpExceptionFilter)
   async login(@Body(ValidationPipe) dto: UserLoginDto): Promise<string> {
     const { email, password } = dto;
     console.log(email, password);
