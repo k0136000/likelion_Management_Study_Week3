@@ -1,5 +1,6 @@
 import { v1 as uuid } from 'uuid';
 import {
+  Inject,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -10,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { UserInfo } from './UserInfo';
+import { WinstonLogger, WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +20,8 @@ export class UsersService {
     private authService: AuthService,
     @InjectRepository(UserEntity) // 유저 모듈 내에서 사용할 저장소 등록
     private userRepository: Repository<UserEntity>,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: WinstonLogger,
     private dataSource: DataSource, // 트랜잭션
   ) {}
   async createUser(name: string, email: string, password: string) {
@@ -49,6 +53,7 @@ export class UsersService {
     });
 
     if (!user) {
+      this.logger.error('error: ' + JSON.stringify(signupVerifyToken));
       throw new NotFoundException('유저가 존재하지 않습니다.');
     }
     //회원 가입 완료 후 바로 로그인이 될 수 있도록 jwt 토큰을 리턴
@@ -150,6 +155,16 @@ export class UsersService {
 
   async findAll() {
     console.log('no');
+  }
+
+  async printWinstonLog(dto) {
+    // console.log(this.logger.name);
+
+    this.logger.error('level: error', dto);
+    this.logger.warn('level: warn', dto);
+    this.logger.log('level: log', dto);
+    this.logger.verbose('level: verbose', dto);
+    this.logger.debug('level: debug', dto);
   }
 }
 function ulid(): string {

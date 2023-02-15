@@ -16,7 +16,13 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
 import { Logger2Middleware } from './middleware/logger2.middleware';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
-
+import { LoggerModule } from './logger/logger.module';
+import { AppService } from './app.service';
+import {
+  utilities as nestWinstonModuleUtilities,
+  WinstonModule,
+} from 'nest-winston';
+import * as winston from 'winston';
 // UsersModule에 usercontroller, emailcontroller가 포함되어 있으므로 여기서 포함시키지 않아도 됨.
 @Module({
   imports: [
@@ -26,14 +32,28 @@ import { PostsModule } from './posts/posts.module';
       isGlobal: true,
       validationSchema, // 환경변수 값에 대해 유효성 검사를 수행하도록 joi를 이용하여 유효성 검사 객체럴 작성함.
     }),
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          level: process.env.NODE_ENV === 'production' ? 'info' : 'silly',
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            nestWinstonModuleUtilities.format.nestLike('MyApp', {
+              prettyPrint: true,
+            }),
+          ),
+        }),
+      ],
+    }),
     TypeOrmModule.forRoot(generateTypeOrmConfig(process.env)),
     UsersModule,
     EmailModule,
     PostsModule,
     AuthModule,
+    LoggerModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {

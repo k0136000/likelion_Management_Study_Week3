@@ -4,17 +4,18 @@ import {
   DefaultValuePipe,
   Get,
   Headers,
-  HttpStatus,
+  HttpException,
   Param,
   ParseIntPipe,
   Post,
   Query,
-  Req,
+  UseFilters,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from 'guards/canactivate.guard';
 import { AuthService } from 'src/auth/auth.service';
+import { HttpExceptionFilter } from 'utils/exceptionPipe';
 import { Token } from 'utils/user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserLoginDto } from './dto/user-login.dto';
@@ -31,8 +32,10 @@ export class UsersController {
 
   //회원가입
   @Post('/save')
+  @UseFilters(HttpExceptionFilter)
   async createUser(@Body(ValidationPipe) dto: CreateUserDto): Promise<void> {
     const { name, email, password } = dto;
+    await this.userService.printWinstonLog(dto);
     await this.userService.createUser(name, email, password);
     console.log(dto);
   }
